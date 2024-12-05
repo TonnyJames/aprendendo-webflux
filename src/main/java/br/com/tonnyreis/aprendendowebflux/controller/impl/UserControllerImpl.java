@@ -1,6 +1,7 @@
 package br.com.tonnyreis.aprendendowebflux.controller.impl;
 
 import br.com.tonnyreis.aprendendowebflux.controller.UserController;
+import br.com.tonnyreis.aprendendowebflux.mapper.UserMapper;
 import br.com.tonnyreis.aprendendowebflux.model.request.UserRequest;
 import br.com.tonnyreis.aprendendowebflux.model.response.UserResponse;
 import br.com.tonnyreis.aprendendowebflux.service.UserService;
@@ -19,6 +20,8 @@ public class UserControllerImpl implements UserController {
 
     private final UserService service;
 
+    private final UserMapper mapper;
+
 
     @Override
     public ResponseEntity<Mono<Void>> save(UserRequest request) {
@@ -26,8 +29,10 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<Mono<UserResponse>> find(String id) {
-        return null;
+    public ResponseEntity<Mono<UserResponse>> findById(String id) {
+        return ResponseEntity.ok().body(
+                service.findById(id).map(mapper::toResponse)
+        );
     }
 
     @Override
