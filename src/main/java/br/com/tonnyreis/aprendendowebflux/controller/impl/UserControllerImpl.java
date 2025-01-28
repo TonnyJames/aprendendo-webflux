@@ -5,7 +5,8 @@ import br.com.tonnyreis.aprendendowebflux.mapper.UserMapper;
 import br.com.tonnyreis.aprendendowebflux.model.request.UserRequest;
 import br.com.tonnyreis.aprendendowebflux.model.response.UserResponse;
 import br.com.tonnyreis.aprendendowebflux.service.UserService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +15,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping(value = "/users")
 public class UserControllerImpl implements UserController {
 
@@ -22,6 +22,11 @@ public class UserControllerImpl implements UserController {
 
     private final UserMapper mapper;
 
+    @Autowired
+    public UserControllerImpl(UserService service, @Qualifier("userMapperImpl") UserMapper mapper) {
+        this.service = service;
+        this.mapper = mapper;
+    }
 
     @Override
     public ResponseEntity<Mono<Void>> save(UserRequest request) {
