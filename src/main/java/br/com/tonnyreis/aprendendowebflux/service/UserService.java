@@ -8,6 +8,7 @@ import br.com.tonnyreis.aprendendowebflux.service.exception.ObjectNotFoundExcept
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static java.lang.String.format;
@@ -36,5 +37,9 @@ public class UserService {
                                 format("Object not found. Id: %s, Type: %s", id, User.class.getSimpleName()))
                         )
                 );
+    }
+
+    public Flux<User> findAll() {
+        return repository.findAll();
     }
 }
