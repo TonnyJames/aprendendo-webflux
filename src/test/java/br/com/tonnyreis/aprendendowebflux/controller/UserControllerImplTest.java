@@ -3,6 +3,7 @@ package br.com.tonnyreis.aprendendowebflux.controller;
 import br.com.tonnyreis.aprendendowebflux.entity.User;
 import br.com.tonnyreis.aprendendowebflux.mapper.UserMapper;
 import br.com.tonnyreis.aprendendowebflux.model.request.UserRequest;
+import br.com.tonnyreis.aprendendowebflux.model.response.UserResponse;
 import br.com.tonnyreis.aprendendowebflux.service.UserService;
 import com.mongodb.reactivestreams.client.MongoClient;
 import org.junit.jupiter.api.DisplayName;
@@ -79,8 +80,25 @@ class UserControllerImplTest {
 
     }
 
-//    @Test
-    void findById() {
+    @Test
+    @DisplayName("testando findById success")
+    void testFindByIdSuccess() {
+
+        final var id = "12345";
+        final var userResponse = new UserResponse(id, "name", "test@mail.com", "123");
+
+        when(service.findById(ArgumentMatchers.any(String.class))).thenReturn(Mono.just(User.builder().build()));
+        when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
+
+        webTestClient.get().uri("/users/" + id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(id)
+                .jsonPath("$.name").isEqualTo("name")
+                .jsonPath("$.email").isEqualTo("test@mail.com")
+                .jsonPath("$.password").isEqualTo("123");
     }
 
 //    @Test
