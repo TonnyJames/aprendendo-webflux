@@ -31,7 +31,7 @@ public class UserService {
     }
 
     public Mono<User> findById(final String id) {
-        return handleNotFound(repository.findAndRemove(id), id);
+        return handleNotFound(repository.findById(id), id);
     }
 
     public Flux<User> findAll() {
