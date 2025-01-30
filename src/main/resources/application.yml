@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${DB_USER:aprendendowebflux}:${DB_PASSWORD}@aprendendowebfluxcluste.jpduzm0.mongodb.net/aprendendo-webflux?retryWrites=true&w=majority&appName=AprendendoWebfluxCluster
+      uri: mongodb+srv://${DB_USER}:${DB_PASSWORD}@aprendendowebfluxcluste.jpduzm0.mongodb.net/${DB_NAME}?retryWrites=true&w=majority&appName=${DB_CLUSTER}
       auto-index-creation: true
   application:
     name: aprendendo-webflux
