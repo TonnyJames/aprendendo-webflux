@@ -31,6 +31,11 @@ import static org.mockito.Mockito.when;
 @AutoConfigureWebTestClient
 class UserControllerImplTest {
 
+    public static final String ID = "12345";
+    public static final String NAME = "name";
+    public static final String EMAIL = "test@mail.com";
+    public static final String PASSWORD = "123";
+
     @MockBean
     private UserService service;
 
@@ -46,7 +51,7 @@ class UserControllerImplTest {
     @Test
     @DisplayName("Testando save com sucesso")
     void testSaveSuccess() {
-        final var request = new UserRequest("name", "test@mail.com", "123");
+        final var request = new UserRequest(NAME, EMAIL, PASSWORD);
 
         when(service.save(ArgumentMatchers.any(UserRequest.class))).thenReturn(Mono.just(User.builder().build()));
 
@@ -63,7 +68,7 @@ class UserControllerImplTest {
     @Test
     @DisplayName("Testando save com badRequest")
     void testSaveBadRequest() {
-        final var request = new UserRequest(" name", "test@mail.com", "123");
+        final var request = new UserRequest(NAME.concat(" "), EMAIL, PASSWORD);
 
         webTestClient.post().uri("/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -75,7 +80,7 @@ class UserControllerImplTest {
                 .jsonPath("$.status").isEqualTo(HttpStatus.BAD_REQUEST.value())
                 .jsonPath("$.error").isEqualTo("Validation error")
                 .jsonPath("$.message").isEqualTo("Error on validation attributes")
-                .jsonPath("$.errors[0].fieldName").isEqualTo("name")
+                .jsonPath("$.errors[0].fieldName").isEqualTo(NAME)
                 .jsonPath("$.errors[0].message").isEqualTo("campo não deve ter espaços em branco no início e no final");
 
     }
@@ -84,21 +89,20 @@ class UserControllerImplTest {
     @DisplayName("testando findById success")
     void testFindByIdSuccess() {
 
-        final var id = "12345";
-        final var userResponse = new UserResponse(id, "name", "test@mail.com", "123");
+        final var userResponse = new UserResponse(ID, NAME, EMAIL, PASSWORD);
 
         when(service.findById(ArgumentMatchers.any(String.class))).thenReturn(Mono.just(User.builder().build()));
         when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
 
-        webTestClient.get().uri("/users/" + id)
+        webTestClient.get().uri("/users/" + ID)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.id").isEqualTo(id)
-                .jsonPath("$.name").isEqualTo("name")
-                .jsonPath("$.email").isEqualTo("test@mail.com")
-                .jsonPath("$.password").isEqualTo("123");
+                .jsonPath("$.id").isEqualTo(ID)
+                .jsonPath("$.name").isEqualTo(NAME)
+                .jsonPath("$.email").isEqualTo(EMAIL)
+                .jsonPath("$.password").isEqualTo(PASSWORD);
     }
 
 //    @Test
