@@ -24,6 +24,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
@@ -104,6 +105,9 @@ class UserControllerImplTest {
                 .jsonPath("$.name").isEqualTo(NAME)
                 .jsonPath("$.email").isEqualTo(EMAIL)
                 .jsonPath("$.password").isEqualTo(PASSWORD);
+
+        Mockito.verify(service, times(1)).findById(anyString());
+        Mockito.verify(mapper, times(1)).toResponse(ArgumentMatchers.any(User.class));
     }
 
     @Test
@@ -125,10 +129,34 @@ class UserControllerImplTest {
                 .jsonPath("$.[0].email").isEqualTo(EMAIL)
                 .jsonPath("$.[0].password").isEqualTo(PASSWORD);
 
+        Mockito.verify(service, times(1)).findAll();
+        Mockito.verify(mapper, times(1)).toResponse(ArgumentMatchers.any(User.class));
+
     }
 
-//    @Test
+    @Test
+    @DisplayName("testando update success")
     void update() {
+
+        final var request = new UserRequest(NAME, EMAIL, PASSWORD);
+        final var userResponse = new UserResponse(ID, NAME, EMAIL, PASSWORD);
+
+        when(service.update(anyString(), ArgumentMatchers.any(UserRequest.class))).thenReturn(Mono.just(User.builder().build()));
+        when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
+
+        webTestClient.patch().uri("/users/" + ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(request))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(ID)
+                .jsonPath("$.name").isEqualTo(NAME)
+                .jsonPath("$.email").isEqualTo(EMAIL)
+                .jsonPath("$.password").isEqualTo(PASSWORD);
+
+        Mockito.verify(service, times(1)).update(anyString(), ArgumentMatchers.any(UserRequest.class));
+        Mockito.verify(mapper, times(1)).toResponse(ArgumentMatchers.any(User.class));
     }
 
 //    @Test
