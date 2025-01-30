@@ -14,7 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface TrimString {
 
-    String message() default "{campo não deve ter espaços em branco no início e no final}";
+    String message() default "campo não deve ter espaços em branco no início e no final";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
