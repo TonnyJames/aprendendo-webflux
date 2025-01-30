@@ -37,6 +37,7 @@ class UserControllerImplTest {
     public static final String NAME = "name";
     public static final String EMAIL = "test@mail.com";
     public static final String PASSWORD = "123";
+    public static final String BASE_URI = "/users";
 
     @MockBean
     private UserService service;
@@ -57,7 +58,7 @@ class UserControllerImplTest {
 
         when(service.save(ArgumentMatchers.any(UserRequest.class))).thenReturn(Mono.just(User.builder().build()));
 
-        webTestClient.post().uri("/users")
+        webTestClient.post().uri(BASE_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(request))
                 .exchange()
@@ -72,13 +73,13 @@ class UserControllerImplTest {
     void testSaveBadRequest() {
         final var request = new UserRequest(NAME.concat(" "), EMAIL, PASSWORD);
 
-        webTestClient.post().uri("/users")
+        webTestClient.post().uri(BASE_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(request))
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.path").isEqualTo("/users")
+                .jsonPath("$.path").isEqualTo(BASE_URI)
                 .jsonPath("$.status").isEqualTo(HttpStatus.BAD_REQUEST.value())
                 .jsonPath("$.error").isEqualTo("Validation error")
                 .jsonPath("$.message").isEqualTo("Error on validation attributes")
@@ -96,7 +97,7 @@ class UserControllerImplTest {
         when(service.findById(ArgumentMatchers.any(String.class))).thenReturn(Mono.just(User.builder().build()));
         when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
 
-        webTestClient.get().uri("/users/" + ID)
+        webTestClient.get().uri(BASE_URI + "/" + ID)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -119,7 +120,7 @@ class UserControllerImplTest {
         when(service.findAll()).thenReturn(Flux.just(User.builder().build()));
         when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
 
-        webTestClient.get().uri("/users")
+        webTestClient.get().uri(BASE_URI)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -144,7 +145,7 @@ class UserControllerImplTest {
         when(service.update(anyString(), ArgumentMatchers.any(UserRequest.class))).thenReturn(Mono.just(User.builder().build()));
         when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
 
-        webTestClient.patch().uri("/users/" + ID)
+        webTestClient.patch().uri(BASE_URI+ "/" + ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(request))
                 .exchange()
@@ -159,7 +160,17 @@ class UserControllerImplTest {
         Mockito.verify(mapper, times(1)).toResponse(ArgumentMatchers.any(User.class));
     }
 
-//    @Test
+    @Test
+    @DisplayName("testando delete success")
     void delete() {
+
+        when(service.delete(anyString())).thenReturn(Mono.just(User.builder().build()));
+
+        webTestClient.delete().uri(BASE_URI + "/" + ID)
+                .exchange()
+                .expectStatus().isOk();
+
+        Mockito.verify(service, times(1)).delete(anyString());
+
     }
 }
